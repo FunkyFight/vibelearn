@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="fr" data-theme="dark" data-pseudo="natural" data-panel="assist">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>vibelearn, maquette</title>
+<style>
+/* Les variables --vscode-* portent les valeurs de VS Code (Dark Modern, Light Modern) :
+   le CSS du panneau se recopie tel quel dans l'extension. */
+:root {
+  color-scheme: dark;
+  --vscode-font-family: "Segoe WPC", "Segoe UI", system-ui, sans-serif;
+  --vscode-editor-font-family: Consolas, "Cascadia Mono", "Courier New", monospace;
+  --vscode-foreground: #cccccc;
+  --vscode-descriptionForeground: #9d9d9d;
+  --vscode-editor-background: #1f1f1f;
+  --vscode-editor-foreground: #cccccc;
+  --vscode-editorLineNumber-foreground: #6e7681;
+  --vscode-panel-border: #2b2b2b;
+  --vscode-list-hoverBackground: #2a2d2e;
+  --vscode-textLink-foreground: #4daafc;
+  --vscode-button-background: #0078d4;
+  --vscode-button-foreground: #ffffff;
+  --vscode-button-hoverBackground: #026ec1;
+  --vscode-button-secondaryBackground: #313131;
+  --vscode-button-secondaryForeground: #cccccc;
+  --vscode-button-secondaryHoverBackground: #3c3c3c;
+  --vscode-input-background: #313131;
+  --vscode-input-foreground: #cccccc;
+  --vscode-input-border: #3c3c3c;
+  --vscode-input-placeholderForeground: #989898;
+  --vscode-focusBorder: #0078d4;
+  --vscode-textCodeBlock-background: #2b2b2b;
+  --vscode-testing-iconPassed: #73c991;
+  --vscode-editorWarning-foreground: #cca700;
+  --vscode-menu-background: #252526;
+  --vscode-menu-border: #454545;
+  --chrome: #181818;
+  --page: #111111;
+  --tok-kw: #569cd6; --tok-type: #4ec9b0; --tok-com: #6a9955; --tok-fn: #dcdcaa; --tok-str: #ce9178;
+  --vl-design: #e06c98;
+  --vl-assist: #3ab7c8;
+  --vl-pseudo: #b993ee;
+  --vl-add: #73c991;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --vscode-foreground: #3b3b3b;
+  --vscode-descriptionForeground: #616161;
+  --vscode-editor-background: #ffffff;
+  --vscode-editor-foreground: #3b3b3b;
+  --vscode-editorLineNumber-foreground: #6e7681;
+  --vscode-panel-border: #e5e5e5;
+  --vscode-list-hoverBackground: #f2f2f2;
+  --vscode-textLink-foreground: #005fb8;
+  --vscode-button-background: #005fb8;
+  --vscode-button-hoverBackground: #0258a8;
+  --vscode-button-secondaryBackground: #e5e5e5;
+  --vscode-button-secondaryForeground: #3b3b3b;
+  --vscode-button-secondaryHoverBackground: #d6d6d6;
+  --vscode-input-background: #ffffff;
+  --vscode-input-foreground: #3b3b3b;
+  --vscode-input-border: #cecece;
+  --vscode-input-placeholderForeground: #767676;
+  --vscode-focusBorder: #005fb8;
+  --vscode-textCodeBlock-background: #f2f2f2;
+  --vscode-testing-iconPassed: #2e7d32;
+  --vscode-editorWarning-foreground: #946200;
+  --vscode-menu-background: #ffffff;
+  --vscode-menu-border: #cecece;
+  --chrome: #f8f8f8;
+  --page: #ececec;
+  --tok-kw: #0000ff; --tok-type: #267f99; --tok-com: #008000; --tok-fn: #795e26; --tok-str: #a31515;
+  --vl-design: #b0336a;
+  --vl-assist: #0f7482;
+  --vl-pseudo: #6f3bc0;
+  --vl-add: #2e7d32;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--vscode-foreground); font: 13px/1.5 var(--vscode-font-family); }
+::selection { background: color-mix(in srgb, var(--vscode-focusBorder) 45%, transparent); }
+:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: 1px; }
+button { font: inherit; color: inherit; }
+
+/* ---- La page de validation ---- */
+.page { max-width: 1480px; margin: 0 auto; padding: 24px 16px 56px; }
+h1 { font-size: 18px; font-weight: 600; margin: 0; text-wrap: balance; }
+.lede { margin: 4px 0 20px; color: var(--vscode-descriptionForeground); max-width: 72ch; }
+.controls { display: flex; flex-wrap: wrap; gap: 12px 28px; margin-bottom: 16px; }
+.seg { border: 0; padding: 0; margin: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.seg legend { float: left; padding: 0; margin-right: 8px; color: var(--vscode-descriptionForeground); }
+.seg-set { display: inline-flex; border: 1px solid color-mix(in srgb, var(--vscode-foreground) 22%, transparent); border-radius: 5px; overflow: hidden; }
+.seg label { position: relative; cursor: pointer; }
+.seg label + label { border-left: 1px solid color-mix(in srgb, var(--vscode-foreground) 22%, transparent); }
+.seg input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.seg span { display: block; padding: 3px 10px; white-space: nowrap; }
+.seg input:checked + span { background: var(--vscode-button-background); color: var(--vscode-button-foreground); }
+.seg input:focus-visible + span { outline: 1px solid var(--vscode-focusBorder); outline-offset: -2px; }
+.seg code { font-family: var(--vscode-editor-font-family); }
+
+.window { display: grid; grid-template-columns: minmax(0, 1fr) 420px; height: 664px; border: 1px solid color-mix(in srgb, var(--vscode-foreground) 16%, transparent); border-radius: 8px; overflow: hidden; background: var(--vscode-editor-background); box-shadow: 0 16px 36px -18px rgba(0, 0, 0, .55); }
+.pane { display: grid; grid-template-rows: 35px minmax(0, 1fr); min-width: 0; min-height: 0; }
+.pane + .pane { border-left: 1px solid var(--vscode-panel-border); }
+.panels { min-height: 0; }
+.tabs { background: var(--chrome); border-bottom: 1px solid var(--vscode-panel-border); display: flex; }
+.tab { display: flex; align-items: center; padding: 0 14px; background: var(--vscode-editor-background); border-right: 1px solid var(--vscode-panel-border); box-shadow: inset 0 1px 0 var(--vscode-focusBorder); }
+
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 8px 40px; margin-top: 28px; }
+.notes h2 { font-size: 13px; font-weight: 600; margin: 0 0 6px; }
+.notes ul { margin: 0; padding-left: 18px; color: var(--vscode-descriptionForeground); max-width: 68ch; }
+.notes li { margin: 4px 0; }
+.notes li b { color: var(--vscode-foreground); font-weight: 600; }
+.notes code, .vl code { font-family: var(--vscode-editor-font-family); font-size: .95em; }
+
+@media (max-width: 1120px) {
+  .window { grid-template-columns: minmax(0, 1fr); height: auto; }
+  .pane.ed { height: 420px; }
+  .pane.side { height: 640px; border-left: 0; border-top: 1px solid var(--vscode-panel-border); }
+}
+
+/* ---- L'éditeur (faux) ---- */
+.editor { overflow: auto; padding: 8px 0; font: 13px/18px var(--vscode-editor-font-family); color: var(--vscode-editor-foreground); scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--vscode-foreground) 25%, transparent) transparent; }
+.ln { height: 18px; white-space: pre; min-width: max-content; padding-right: 16px; }
+.no { display: inline-block; width: 5ch; text-align: right; color: var(--vscode-editorLineNumber-foreground); }
+.glyph { display: inline-block; width: 22px; height: 18px; vertical-align: top; text-align: center; }
+.glyph svg { vertical-align: -3px; }
+.k { color: var(--tok-kw); } .t { color: var(--tok-type); } .c { color: var(--tok-com); } .f { color: var(--tok-fn); } .s { color: var(--tok-str); }
+
+/* Le bloc de pseudo-code : deux boîtes par ligne (ce que VS Code sait dessiner au bout d'une ligne). */
+.editor {
+  --ps-bg: color-mix(in srgb, var(--vscode-editor-background), var(--vl-pseudo) 8%);
+  --ps-head: color-mix(in srgb, var(--vscode-editor-background), var(--vl-pseudo) 17%);
+  --ps-line: color-mix(in srgb, var(--vl-pseudo) 34%, transparent);
+  --ps-hair: color-mix(in srgb, var(--vl-pseudo) 22%, transparent);
+}
+.ps { display: inline-block; vertical-align: top; height: 18px; overflow: hidden; white-space: pre; background: var(--ps-bg);
+  --t: 0 0 transparent; --b: 0 0 transparent; --l: 0 0 transparent; --r: 0 0 transparent; box-shadow: var(--t), var(--b), var(--l), var(--r); }
+.ps.c-first { --l: inset 1px 0 0 var(--ps-line); }
+.ps.c-last { --r: inset -1px 0 0 var(--ps-line); }
+.ps.r-first { --t: inset 0 1px 0 var(--ps-line); }
+.ps.r-last { --b: inset 0 -1px 0 var(--ps-line); }
+.ps.sep { --t: inset 0 1px 0 var(--ps-hair); }
+.ps.r-first.c-first { border-top-left-radius: 5px; } .ps.r-first.c-last { border-top-right-radius: 5px; }
+.ps.r-last.c-first { border-bottom-left-radius: 5px; } .ps.r-last.c-last { border-bottom-right-radius: 5px; }
+.ps.head { background: var(--ps-head); font-weight: 600; }
+.ps.mark { text-align: right; padding-right: 1ch; color: var(--vl-pseudo); }
+.ps.mark.add { color: var(--vl-add); font-weight: 600; }
+.ps.kw { color: var(--vl-pseudo); font-weight: 600; }
+.ps.dim { color: var(--vscode-descriptionForeground); }
+
+/* ---- Le panneau vibelearn ---- */
+.vl { --hair: color-mix(in srgb, var(--vscode-foreground) 13%, transparent); --fill: color-mix(in srgb, var(--vscode-foreground) 8%, transparent);
+  --desc: var(--vscode-descriptionForeground); --link: var(--vscode-textLink-foreground);
+  display: none; grid-template-rows: auto minmax(0, 1fr) auto; height: 100%; min-height: 0; background: var(--vscode-editor-background); }
+:root[data-panel="assist"] .vl[data-view="assist"], :root[data-panel="empty"] .vl[data-view="empty"],
+:root[data-panel="lesson"] .vl[data-view="lesson"], :root[data-panel="prompt"] .vl[data-view="prompt"] { display: grid; }
+:where(.vl p) { margin: 0; }
+.vl code { background: var(--vscode-textCodeBlock-background); padding: 0 4px; border-radius: 3px; }
+
+/* Barre d'état : ce que fait vibelearn, et les deux seules commandes toujours utiles. */
+.bar { position: relative; display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 12px; border-bottom: 1px solid var(--hair); }
+.state { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--vscode-testing-iconPassed); }
+.state.wait { background: var(--link); }
+.state.busy { background: none; border: 1.5px solid var(--link); border-right-color: transparent; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.bar-text { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-text strong { font-weight: 600; }
+.bar-text span { color: var(--desc); margin-left: 8px; }
+.btn { border: 0; border-radius: 4px; padding: 3px 10px; cursor: pointer; background: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground); white-space: nowrap; transition: background-color .15s; }
+.btn:hover { background: var(--vscode-button-secondaryHoverBackground); }
+.btn.primary { background: var(--vscode-button-background); color: var(--vscode-button-foreground); }
+.btn.primary:hover { background: var(--vscode-button-hoverBackground); }
+.icon-btn { flex: none; display: grid; place-items: center; width: 26px; height: 26px; border: 0; border-radius: 4px; background: none; cursor: pointer; transition: background-color .15s; }
+.icon-btn:hover, .icon-btn[aria-expanded="true"] { background: var(--fill); }
+.link { border: 0; padding: 0; background: none; cursor: pointer; color: var(--link); }
+.link:hover { text-decoration: underline; }
+.menu { position: absolute; z-index: 2; top: calc(100% - 2px); right: 8px; min-width: 220px; padding: 4px; border: 1px solid var(--vscode-menu-border); border-radius: 6px; background: var(--vscode-menu-background); box-shadow: 0 2px 8px rgba(0, 0, 0, .36); }
+.menu-item { display: block; width: 100%; text-align: left; border: 0; border-radius: 4px; padding: 4px 10px; background: none; cursor: pointer; }
+.menu-item:hover, .menu-item:focus-visible { background: var(--vscode-list-hoverBackground); }
+.menu hr { border: 0; border-top: 1px solid var(--hair); margin: 4px 0; }
+.menu-note { padding: 4px 10px 2px; font-size: 12px; color: var(--desc); }
+.steps { position: absolute; left: 0; right: 0; bottom: -1px; display: flex; gap: 2px; height: 2px; }
+.steps i { flex: 1; background: color-mix(in srgb, var(--vscode-foreground) 20%, transparent); }
+.steps i.done { background: var(--vscode-testing-iconPassed); }
+.steps i.now { background: var(--link); }
+
+.body { overflow-y: auto; padding-bottom: 16px; scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--vscode-foreground) 25%, transparent) transparent; }
+.group-title { margin: 0; padding: 16px 12px 4px; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--desc); }
+
+/* Ce que vibelearn a dit ou fait sur le code : une liste, pas des cartes. */
+.rows { list-style: none; margin: 0; padding: 0; }
+.row { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 0 8px; padding: 6px 12px; transition: background-color .15s; }
+.row:hover, .row:focus-within { background: var(--vscode-list-hoverBackground); }
+.tone { width: 14px; height: 14px; margin-top: 3px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.tone.ok { color: var(--vscode-testing-iconPassed); } .tone.fix { color: var(--vscode-editorWarning-foreground); }
+.tone.design { color: var(--vl-design); } .tone.assist { color: var(--vl-assist); }
+.row-title { display: block; width: 100%; border: 0; padding: 0; background: none; text-align: left; cursor: pointer; }
+.row-detail { color: var(--desc); max-width: 68ch; }
+.row-meta { display: flex; flex-wrap: wrap; gap: 0 12px; margin-top: 2px; font-size: 12px; color: var(--desc); font-variant-numeric: tabular-nums; }
+.row-actions { display: flex; gap: 12px; opacity: 0; transition: opacity .15s; }
+.row:hover .row-actions, .row:focus-within .row-actions, .row-actions.always { opacity: 1; }
+@media (hover: none) { .row-actions { opacity: 1; } }
+.swap { display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.swap svg { width: 14px; height: 14px; fill: none; stroke: var(--desc); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Discussion : la question à droite, la réponse en plein texte. */
+.turn { padding: 6px 12px 0; }
+.q { margin-left: auto; width: fit-content; max-width: 88%; padding: 5px 10px; border-radius: 10px 10px 3px 10px; background: var(--fill); }
+.q-loc { text-align: right; margin-top: 2px; font-size: 12px; font-variant-numeric: tabular-nums; }
+.q-loc .link { color: var(--desc); }
+.a { margin-top: 8px; max-width: 68ch; }
+.a p + p { margin-top: 8px; }
+.older { padding: 2px 12px 4px; color: var(--desc); }
+.older summary { cursor: pointer; width: fit-content; }
+.older summary:hover { color: var(--vscode-foreground); }
+.older ul { list-style: none; margin: 4px 0 0; padding: 0 0 0 14px; }
+.older li .link { color: inherit; padding: 2px 0; text-align: left; }
+
+/* Leçon */
+.lesson-title { margin: 0; padding: 16px 12px 0; font-size: 16px; font-weight: 600; line-height: 1.3; text-wrap: balance; }
+.prose { padding: 0 12px; max-width: 70ch; }
+.task { margin: 16px 12px 0; padding: 10px 12px 12px; border-radius: 6px; background: color-mix(in srgb, var(--link) 11%, transparent); }
+.task-head { display: flex; justify-content: space-between; gap: 12px; font-weight: 600; color: var(--link); }
+.task-head span { font-weight: 400; font-size: 12px; font-variant-numeric: tabular-nums; }
+.task-goal { margin-top: 4px; max-width: 66ch; }
+.criteria { list-style: none; margin: 8px 0 0; padding: 0; }
+.criteria li { position: relative; padding-left: 18px; margin-top: 3px; }
+.criteria li::before { content: ""; position: absolute; left: 6px; top: .62em; width: 4px; height: 4px; border-radius: 50%; background: currentColor; opacity: .55; }
+.task-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 12px; color: var(--desc); font-size: 12px; }
+
+/* Question de vibelearn : le seul encadré, parce qu'il attend une réponse. */
+.ask { margin: 12px 12px 0; padding: 12px; border: 1px solid var(--vscode-focusBorder); border-radius: 6px; }
+.ask-q { font-weight: 600; max-width: 60ch; }
+.choices { display: grid; gap: 6px; margin-top: 10px; }
+.choices .btn { text-align: left; white-space: normal; padding: 6px 10px; }
+.ask .link { margin-top: 10px; }
+
+/* État vide : il apprend l'outil. */
+.empty { padding: 24px 12px 0; max-width: 60ch; }
+.empty h2 { margin: 0 0 4px; font-size: 14px; font-weight: 600; }
+.empty > p { color: var(--desc); }
+.empty dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 20px 0 0; }
+.empty dt { font-family: var(--vscode-editor-font-family); color: var(--tok-com); }
+.empty dd { margin: 0; color: var(--desc); }
+.empty .lead-in { margin-top: 20px; color: var(--vscode-foreground); }
+.empty .lead-in + dl { margin-top: 8px; }
+
+/* Bas : les aides (en leçon), puis le champ. */
+.composer { padding: 8px 12px 12px; border-top: 1px solid var(--hair); }
+.help { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.help .btn { padding: 2px 9px; font-size: 12px; }
+.help .btn small { font-size: inherit; opacity: .65; margin-left: 2px; }
+.field { display: flex; align-items: center; gap: 6px; padding: 2px 2px 2px 8px; border: 1px solid var(--vscode-input-border); border-radius: 6px; background: var(--vscode-input-background); }
+.field:focus-within { border-color: var(--vscode-focusBorder); }
+.field input { flex: 1; min-width: 0; border: 0; outline: 0; padding: 4px 0; background: none; font: inherit; color: var(--vscode-input-foreground); caret-color: var(--link); }
+.field input::placeholder { color: var(--vscode-input-placeholderForeground); }
+.ctx { flex: none; padding: 0 6px; border-radius: 3px; background: var(--fill); font-size: 12px; color: var(--desc); font-variant-numeric: tabular-nums; }
+.send { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border: 0; border-radius: 4px; background: var(--vscode-button-background); color: var(--vscode-button-foreground); cursor: pointer; }
+.send:hover { background: var(--vscode-button-hoverBackground); }
+.send svg, .icon-btn svg { width: 16px; height: 16px; }
+.send svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-check" viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 16 16"><path d="M8 2l6.5 11.5h-13z"/><path d="M8 6.5v3"/><path d="M8 11.8v.2"/></symbol>
+  <symbol id="i-blocks" viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5" rx=".5"/><rect x="9" y="2" width="5" height="5" rx=".5"/><rect x="2" y="9" width="5" height="5" rx=".5"/><path d="M11.5 9.5v4M9.5 11.5h4"/></symbol>
+  <symbol id="i-pencil" viewBox="0 0 16 16"><path d="M3 13l.8-3.2L11 2.6l2.4 2.4-7.2 7.2z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 16 16"><path d="M3 8h9"/><path d="M9 5l3 3-3 3"/></symbol>
+  <symbol id="i-send" viewBox="0 0 16 16"><path d="M8 13V3.5"/><path d="M4 7l4-4 4 4"/></symbol>
+  <symbol id="i-dots" viewBox="0 0 16 16"><circle cx="3.5" cy="8" r="1.2" fill="currentColor"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/><circle cx="12.5" cy="8" r="1.2" fill="currentColor"/></symbol>
+</svg>
+
+<div class="page">
+  <h1>vibelearn : le pseudo-code dans l'éditeur et le panneau, refaits</h1>
+  <p class="lede">Maquette à valider, rien n'est encore changé dans l'extension. Les boutons changent ce qui est affiché.</p>
+
+  <div class="controls">
+    <fieldset class="seg"><legend>Pseudo-code</legend><div class="seg-set">
+      <label><input type="radio" name="pseudo" value="natural" checked><span><code>////</code> en phrases</span></label>
+      <label><input type="radio" name="pseudo" value="formal"><span><code>////!</code> formel</span></label>
+    </div></fieldset>
+    <fieldset class="seg"><legend>Panneau</legend><div class="seg-set">
+      <label><input type="radio" name="panel" value="assist" checked><span>Assistance</span></label>
+      <label><input type="radio" name="panel" value="empty"><span>Rien à signaler</span></label>
+      <label><input type="radio" name="panel" value="lesson"><span>Leçon</span></label>
+      <label><input type="radio" name="panel" value="prompt"><span>Question posée</span></label>
+    </div></fieldset>
+    <fieldset class="seg"><legend>Thème</legend><div class="seg-set">
+      <label><input type="radio" name="theme" value="dark" checked><span>Sombre</span></label>
+      <label><input type="radio" name="theme" value="light"><span>Clair</span></label>
+    </div></fieldset>
+  </div>
+
+  <div class="window">
+    <section class="pane ed" aria-label="Éditeur">
+      <div class="tabs"><div class="tab">PopcornHook.cs</div></div>
+      <div class="editor" id="editor" tabindex="0"></div>
+    </section>
+
+    <section class="pane side" aria-label="Panneau vibelearn">
+      <div class="tabs"><div class="tab">vibelearn</div></div>
+      <div class="panels">
+
+        <!-- Assistance : des remarques, une correction, une discussion -->
+        <div class="vl" data-view="assist">
+          <header class="bar">
+            <span class="state" aria-hidden="true"></span>
+            <p class="bar-text"><strong>Assistance</strong><span>je regarde tes sauvegardes</span></p>
+            <button class="btn" type="button">Vérifier</button>
+            <button class="icon-btn" type="button" aria-label="Plus d'actions" aria-expanded="false" data-menu><svg><use href="#i-dots"/></svg></button>
+            <div class="menu" hidden>
+              <button class="menu-item" type="button">Arrêter la session</button>
+              <hr>
+              <p class="menu-note">claude-sonnet-5-5 · effort moyen</p>
+            </div>
+          </header>
+          <main class="body">
+            <h2 class="group-title">Sur ton code</h2>
+            <ul class="rows">
+              <li class="row">
+                <svg class="tone assist" aria-label="Corrigé par vibelearn"><use href="#i-pencil"/></svg>
+                <div>
+                  <button class="row-title" type="button"><span class="swap"><code>controls.stick</code><svg aria-label="devient"><use href="#i-arrow"/></svg><code>controls.Stick</code></span></button>
+                  <p class="row-detail">La propriété s'appelle <code>Stick</code> dans <code>Controls</code> : sans la majuscule, ça ne compile pas.</p>
+                  <p class="row-meta"><span>PopcornHook.cs:15</span><span class="row-actions always"><button class="link" type="button">Annuler</button></span></p>
+                </div>
+              </li>
+              <li class="row">
+                <svg class="tone fix" aria-label="À corriger"><use href="#i-alert"/></svg>
+                <div>
+                  <button class="row-title" type="button">La direction lissée n'est jamais remise à zéro</button>
+                  <p class="row-detail">Dans <code>OnDisable</code>, tu vides <code>stick</code> mais pas la direction lissée : au prochain lancer, le grappin repart de travers.</p>
+                  <p class="row-meta"><span>PopcornHook.cs:19</span><span class="row-actions"><button class="link" type="button">Apprends-moi</button><button class="link" type="button">Oublie</button></span></p>
+                </div>
+              </li>
+              <li class="row">
+                <svg class="tone design" aria-label="Conception"><use href="#i-blocks"/></svg>
+                <div>
+                  <button class="row-title" type="button"><code>PopcornHook</code> lit l'entrée et oriente le grappin</button>
+                  <p class="row-detail">Deux raisons de modifier cette classe. La lecture du stick peut vivre dans son propre composant.</p>
+                  <p class="row-meta"><span>PopcornHook.cs:3</span><span class="row-actions"><button class="link" type="button">Apprends-moi</button><button class="link" type="button">Oublie</button></span></p>
+                </div>
+              </li>
+              <li class="row">
+                <svg class="tone ok" aria-label="Bien"><use href="#i-check"/></svg>
+                <div>
+                  <button class="row-title" type="button">L'entrée est lue une seule fois par image</button>
+                  <p class="row-meta"><span>PopcornHook.cs:11</span><span class="row-actions"><button class="link" type="button">Oublie</button></span></p>
+                </div>
+              </li>
+            </ul>
+
+            <h2 class="group-title">Discussion</h2>
+            <details class="older">
+              <summary>2 questions précédentes</summary>
+              <ul>
+                <li><button class="link" type="button">C'est quoi, la traînée, ici ?</button></li>
+                <li><button class="link" type="button">Pourquoi lire le stick dans Update ?</button></li>
+              </ul>
+            </details>
+            <article class="turn">
+              <p class="q">Pourquoi MoveTowards plutôt que Lerp ?</p>
+              <p class="q-loc"><button class="link" type="button">PopcornHook.cs:11</button></p>
+              <div class="a">
+                <p><code>Lerp</code> avance d'une <b>fraction</b> de l'écart : plus la direction est proche du stick, plus elle ralentit, et elle n'arrive jamais tout à fait.</p>
+                <p><code>MoveTowards</code> avance d'une <b>distance fixe</b> par image et s'arrête pile sur la cible. Ta traînée est réglée en unités par seconde : c'est lui qu'il te faut.</p>
+              </div>
+            </article>
+          </main>
+          <footer class="composer">
+            <form class="field" onsubmit="return false">
+              <span class="ctx" title="Ta question portera sur cette ligne">ligne 11</span>
+              <input type="text" aria-label="Pose ta question" placeholder="Pose ta question…" autocomplete="off">
+              <button class="send" type="submit" aria-label="Envoyer"><svg><use href="#i-send"/></svg></button>
+            </form>
+          </footer>
+        </div>
+
+        <!-- Rien à signaler : l'état vide apprend l'outil -->
+        <div class="vl" data-view="empty">
+          <header class="bar">
+            <span class="state" aria-hidden="true"></span>
+            <p class="bar-text"><strong>Assistance</strong><span>je regarde tes sauvegardes</span></p>
+            <button class="btn" type="button">Vérifier</button>
+            <button class="icon-btn" type="button" aria-label="Plus d'actions" aria-expanded="false" data-menu><svg><use href="#i-dots"/></svg></button>
+            <div class="menu" hidden>
+              <button class="menu-item" type="button">Arrêter la session</button>
+              <hr>
+              <p class="menu-note">claude-sonnet-5-5 · effort moyen</p>
+            </div>
+          </header>
+          <main class="body">
+            <div class="empty">
+              <h2>Code, puis Ctrl+S.</h2>
+              <p>Je te dis si ça casse ou si ça peut être plus solide. Je ne corrige moi-même que ce qui découle sans choix de ce que tu viens d'écrire.</p>
+              <p class="lead-in">Tu peux aussi me parler depuis ton code :</p>
+              <dl>
+                <dt>//? …</dt><dd>une question sur cette ligne</dd>
+                <dt>//// …</dt><dd>le pseudo-code, en phrases</dd>
+                <dt>////! …</dt><dd>le pseudo-code formel</dd>
+                <dt>//n …</dt><dd>la prochaine étape d'une fonctionnalité</dd>
+                <dt>//t …</dt><dd>une mini-leçon, là, dans ton code</dd>
+              </dl>
+            </div>
+          </main>
+          <footer class="composer">
+            <form class="field" onsubmit="return false">
+              <input type="text" aria-label="Pose ta question" placeholder="Pose ta question…" autocomplete="off">
+              <button class="send" type="submit" aria-label="Envoyer"><svg><use href="#i-send"/></svg></button>
+            </form>
+          </footer>
+        </div>
+
+        <!-- Leçon guidée -->
+        <div class="vl" data-view="lesson">
+          <header class="bar">
+            <span class="state busy" aria-hidden="true"></span>
+            <p class="bar-text"><strong>Étape 2 sur 5</strong><span>je vérifie ton code…</span></p>
+            <button class="btn" type="button">Vérifier</button>
+            <button class="icon-btn" type="button" aria-label="Plus d'actions" aria-expanded="false" data-menu><svg><use href="#i-dots"/></svg></button>
+            <div class="menu" hidden>
+              <button class="menu-item" type="button">Où en est-on ?</button>
+              <button class="menu-item" type="button">Passer cette étape</button>
+              <button class="menu-item" type="button">Terminer la session</button>
+              <hr>
+              <button class="menu-item" type="button">Arrêter, reprendre plus tard</button>
+              <hr>
+              <p class="menu-note">claude-sonnet-5-5 · effort moyen</p>
+            </div>
+            <div class="steps" role="progressbar" aria-label="Étapes" aria-valuemin="0" aria-valuemax="5" aria-valuenow="2"><i class="done"></i><i class="now"></i><i></i><i></i><i></i></div>
+          </header>
+          <main class="body">
+            <h2 class="lesson-title">Borner le pas avec le temps écoulé</h2>
+            <h3 class="group-title">À savoir</h3>
+            <p class="prose">Une vitesse en unités par seconde devient un déplacement par image quand tu la multiplies par <code>Time.deltaTime</code>. Sans ça, le grappin tourne plus vite sur une machine rapide.</p>
+            <div class="task">
+              <p class="task-head">À toi <span>PopcornHook.cs:11</span></p>
+              <p class="task-goal">Dans <code>Update</code>, calcule le pas maximal de cette image à partir de <code>dragAcceleration</code> et range-le dans une variable.</p>
+              <ul class="criteria">
+                <li>Le pas dépend de <code>Time.deltaTime</code>.</li>
+                <li>Aucune valeur n'est écrite en dur.</li>
+              </ul>
+              <p class="task-foot"><button class="btn" type="button">Où écrire ?</button><span>Code, puis Ctrl+S : je regarde.</span></p>
+            </div>
+            <h3 class="group-title">Sur ton code</h3>
+            <ul class="rows">
+              <li class="row">
+                <svg class="tone fix" aria-label="À corriger"><use href="#i-alert"/></svg>
+                <div>
+                  <button class="row-title" type="button"><code>pasMax</code> ne dépend pas encore du temps</button>
+                  <p class="row-detail">Tu multiplies par <code>0.02</code> : c'est la durée d'une image à 50 images par seconde, pas celle de ta machine.</p>
+                  <p class="row-meta"><span>PopcornHook.cs:12</span></p>
+                </div>
+              </li>
+            </ul>
+          </main>
+          <footer class="composer">
+            <div class="help">
+              <button class="btn" type="button">Indice <small>1/4</small></button>
+              <button class="btn" type="button">Je bloque</button>
+              <button class="btn" type="button">Explique autrement</button>
+              <button class="btn" type="button">Plus de détails</button>
+            </div>
+            <form class="field" onsubmit="return false">
+              <span class="ctx" title="Ta question portera sur cette ligne">ligne 12</span>
+              <input type="text" aria-label="Pose ta question" placeholder="Pose ta question…" autocomplete="off">
+              <button class="send" type="submit" aria-label="Envoyer"><svg><use href="#i-send"/></svg></button>
+            </form>
+          </footer>
+        </div>
+
+        <!-- vibelearn pose une question -->
+        <div class="vl" data-view="prompt">
+          <header class="bar">
+            <span class="state wait" aria-hidden="true"></span>
+            <p class="bar-text"><strong>Assistance</strong><span>j'attends ta réponse</span></p>
+            <button class="btn" type="button">Vérifier</button>
+            <button class="icon-btn" type="button" aria-label="Plus d'actions" aria-expanded="false" data-menu><svg><use href="#i-dots"/></svg></button>
+            <div class="menu" hidden>
+              <button class="menu-item" type="button">Arrêter la session</button>
+              <hr>
+              <p class="menu-note">claude-sonnet-5-5 · effort moyen</p>
+            </div>
+          </header>
+          <main class="body">
+            <div class="ask">
+              <p class="ask-q">Deux façons de faire tiennent la route ici. Laquelle préfères-tu pour ton projet ?</p>
+              <div class="choices">
+                <button class="btn" type="button">Garder la direction lissée dans l'état du grappin</button>
+                <button class="btn" type="button">La recalculer à chaque image depuis le stick</button>
+              </div>
+              <button class="link" type="button">Je ne sais pas</button>
+            </div>
+            <h2 class="group-title">Sur ton code</h2>
+            <ul class="rows">
+              <li class="row">
+                <svg class="tone fix" aria-label="À corriger"><use href="#i-alert"/></svg>
+                <div>
+                  <button class="row-title" type="button">La direction lissée n'est jamais remise à zéro</button>
+                  <p class="row-detail">Dans <code>OnDisable</code>, tu vides <code>stick</code> mais pas la direction lissée : au prochain lancer, le grappin repart de travers.</p>
+                  <p class="row-meta"><span>PopcornHook.cs:19</span><span class="row-actions"><button class="link" type="button">Apprends-moi</button><button class="link" type="button">Oublie</button></span></p>
+                </div>
+              </li>
+            </ul>
+          </main>
+          <footer class="composer">
+            <form class="field" onsubmit="return false">
+              <input type="text" aria-label="Pose ta question" placeholder="Pose ta question…" autocomplete="off">
+              <button class="send" type="submit" aria-label="Envoyer"><svg><use href="#i-send"/></svg></button>
+            </form>
+          </footer>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <div class="notes">
+    <div>
+      <h2>Dans l'éditeur</h2>
+      <ul>
+        <li><b>Un seul bloc, de largeur fixe.</b> Fini les lignes de longueurs différentes posées les unes sous les autres.</li>
+        <li><b>Plus aucune icône.</b> La marge du bloc porte l'organisation : <code>+</code> pour ce qu'il faut créer, un numéro par étape, un retrait pour le détail d'une étape.</li>
+        <li><b>Un titre seulement quand le code va ailleurs</b> que là où tu as écrit le commentaire.</li>
+        <li><b><code>////!</code></b> : les fonctions utilitaires d'abord, puis l'algorithme, avec les mots-clés en gras.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Dans le panneau</h2>
+      <ul>
+        <li><b>Une ligne d'état en haut</b> remplace le bandeau permanent, son paragraphe et le statut du bas.</li>
+        <li><b>« Sur ton code »</b> : remarques et corrections dans une liste compacte, la plus grave d'abord. Les actions d'une ligne apparaissent au survol.</li>
+        <li><b>« Discussion »</b> : ta question à droite, la réponse en plein texte, les anciennes questions repliées.</li>
+        <li><b>Rangés dans le menu ⋯</b> : arrêter, passer l'étape, terminer, le modèle et l'effort.</li>
+        <li><b>L'aide sur les commentaires</b> (<code>//?</code>, <code>////</code>, <code>//n</code>, <code>//t</code>) s'affiche quand il n'y a rien à signaler.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+// Le fichier ouvert, et la ligne du commentaire `////` (le bloc commence une ligne plus bas).
+const CODE = [
+  'using UnityEngine;',
+  '',
+  'public class PopcornHook : MonoBehaviour',
+  '{',
+  '    [SerializeField] Transform hook;',
+  '    Vector2 stick;',
+  '',
+  null,
+  '    void Update()',
+  '    {',
+  '        stick = ReadStick();',
+  '',
+  '    }',
+  '',
+  '    Vector2 ReadStick() => controls.Stick;',
+  '',
+  '    void OnDisable()',
+  '    {',
+  '        stick = Vector2.zero;',
+  '    }',
+  '}',
+  '',
+];
+const REQUEST = 7;
+const COMMENT = { natural: '    //// lisser la direction du grappin avec la traînée', formal: '    ////! lisser la direction du grappin avec la traînée' };
+
+// Ce que le modèle renvoie, déjà rangé : titre, choses à créer, lignes (retrait = imbrication).
+const PSEUDO = {
+  natural: [
+    { title: 'À écrire dans PopcornHookAccelerationState' },
+    { add: 'smoothedDirection : Vector2, à zéro au départ' },
+    { add: "dragAcceleration : float, réglable dans l'inspecteur" },
+    { line: "Prends dt, le temps écoulé depuis l'image précédente.", sep: true },
+    { line: 'Si le stick est relâché :' },
+    { line: 'garde smoothedDirection telle quelle et arrête-toi là.', depth: 1 },
+    { line: 'Calcule pasMax : dragAcceleration multiplié par dt.' },
+    { line: 'Avance smoothedDirection vers stick, sans dépasser pasMax :' },
+    { line: "c'est ce que fait Vector2.MoveTowards.", depth: 1 },
+    { line: 'Oriente le grappin selon smoothedDirection.' },
+  ],
+  formal: [
+    { add: 'smoothedDirection : Vector2 <- (0, 0)' },
+    { add: 'dragAcceleration : float' },
+    { kw: 'fonction', line: 'Orienter(objet, direction) :', sep: true },
+    { line: 'angle <- Atan2(direction.y, direction.x) en degrés', depth: 1 },
+    { line: 'objet.rotation <- rotation de angle autour de Z', depth: 1 },
+    { line: 'dt <- Time.deltaTime', sep: true },
+    { kw: 'si', line: 'longueur(stick) = 0 :' },
+    { kw: 'retourner', line: '', depth: 1 },
+    { line: 'pasMax <- dragAcceleration * dt' },
+    { line: 'smoothedDirection <- MoveTowards(smoothedDirection, stick, pasMax)' },
+    { line: 'Orienter(hook, smoothedDirection)' },
+  ],
+};
+
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
+const KEYWORDS = new Set(['using', 'public', 'class', 'void', 'return', 'new']);
+const TYPES = new Set(['PopcornHook', 'MonoBehaviour', 'SerializeField', 'Transform', 'Vector2', 'UnityEngine']);
+function highlight(line) {
+  if (line.trim().startsWith('//')) return `<span class="c">${esc(line)}</span>`;
+  return line.replace(/[A-Za-z_]\w*(?=\()|[A-Za-z_]\w*|[^A-Za-z_]+/g, (tok, at) => {
+    if (KEYWORDS.has(tok)) return `<span class="k">${tok}</span>`;
+    if (TYPES.has(tok)) return `<span class="t">${tok}</span>`;
+    if (/^[A-Za-z_]/.test(tok) && line[at + tok.length] === '(') return `<span class="f">${tok}</span>`;
+    return esc(tok);
+  });
+}
+
+/** Les lignes du bloc, chacune en deux boîtes au plus (`before` et `after` d'une décoration VS Code). */
+function layout(rows, style) {
+  const gutter = style === 'natural' ? 4 : 3;
+  const step = style === 'natural' ? 2 : 4;
+  let n = 0;
+  const built = rows.map((r) => {
+    const depth = r.depth || 0;
+    if (r.title) return { head: true, mark: '', text: r.title, pad: 0 };
+    if (r.add) return { mark: '+', add: true, text: r.add, pad: 0 };
+    if (r.kw) return { kw: r.kw, text: r.line ? ' ' + r.line : '', pad: depth * step, sep: r.sep };
+    const mark = style === 'natural' && !depth ? String(++n) : '';
+    return { mark, text: r.line, pad: depth * step, sep: r.sep };
+  });
+  const width = Math.max(...built.map((b) => gutter + b.pad + (b.kw || '').length + b.text.length)) + 2;
+  return built.map((b, i) => {
+    const edge = (i === 0 ? ' r-first' : '') + (i === built.length - 1 ? ' r-last' : '') + (b.sep ? ' sep' : '') + (b.head ? ' head' : '');
+    const first = b.kw
+      ? { cls: 'kw', text: b.kw, width: gutter + b.pad + b.kw.length, pad: gutter + b.pad }
+      : { cls: 'mark' + (b.add ? ' add' : ''), text: b.mark, width: gutter, pad: 0 };
+    const second = { cls: '', text: b.text, width: width - first.width, pad: b.kw ? 0 : b.pad };
+    return { edge, cells: [first, second] };
+  });
+}
+
+const ICON = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="var(--vl-pseudo)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-label="Pseudo-code demandé"><path d="M5 4L2 8l3 4"/><path d="M11 4l3 4-3 4"/><path d="M7 8h.01M9 8h.01"/></svg>';
+
+function renderEditor() {
+  const style = document.documentElement.dataset.pseudo;
+  const code = CODE.map((l, i) => (i === REQUEST ? COMMENT[style] : l));
+  const rows = layout(PSEUDO[style], style);
+  const start = REQUEST + 1;
+  // Comme dans l'extension : la colonne du bloc dépasse de 4 la plus longue ligne qu'il longe.
+  const column = Math.max(...rows.map((_, i) => (code[start + i] || '').length)) + 4;
+  document.getElementById('editor').innerHTML = code
+    .map((l, i) => {
+      const row = rows[i - start];
+      const block = row
+        ? row.cells
+            .map((c, j) => {
+              const css = `width:${c.width}ch;padding-left:${c.pad}ch;` + (j === 0 ? `margin-left:${column - l.length}ch;` : '');
+              return `<span class="ps ${c.cls} ${j === 0 ? 'c-first' : 'c-last'}${row.edge}" style="${css}">${esc(c.text)}</span>`;
+            })
+            .join('')
+        : '';
+      return `<div class="ln"><span class="no">${i + 1}</span><span class="glyph">${i === REQUEST ? ICON : ''}</span>${highlight(l)}${block}</div>`;
+    })
+    .join('');
+}
+
+for (const input of document.querySelectorAll('.controls input')) {
+  input.addEventListener('change', () => {
+    document.documentElement.dataset[input.name] = input.value;
+    closeMenus();
+    if (input.name === 'pseudo') renderEditor();
+  });
+}
+
+function closeMenus() {
+  for (const b of document.querySelectorAll('[data-menu]')) {
+    b.setAttribute('aria-expanded', 'false');
+    b.nextElementSibling.hidden = true;
+  }
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-menu]');
+  const open = b && b.getAttribute('aria-expanded') !== 'true';
+  if (!e.target.closest('.menu')) closeMenus();
+  if (open) {
+    b.setAttribute('aria-expanded', 'true');
+    b.nextElementSibling.hidden = false;
+  }
+});
+document.addEventListener('keydown', (e) => e.key === 'Escape' && closeMenus());
+
+renderEditor();
+</script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "tiny-text",
+        "value": "*",
+        "files": [
+          ".vibelearn/mockups/assist.html"
+        ],
+        "createdAt": "2026-11-22T07:48:23.950Z",
+        "reason": "Claude: maquette fidèle à VS Code, dont le titre de panneau fait 11px en majuscules"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          ".vibelearn/mockups/assist.html"
+        ],
+        "createdAt": "2026-11-22T07:48:48.353Z",
+        "reason": "Claude: maquette qui reprend les marges réelles de VS Code et de vscode/extension.js (code en ligne, boutons discrets)"
+      },
+      {
+        "rule": "tiny-text",
+        "value": "*",
+        "files": [
+          ".vibelearn/mockups/teach.html"
+        ],
+        "createdAt": "2026-11-22T08:57:52.564Z",
+        "reason": "Claude: maquette fidèle à VS Code (titre de panneau 11px, comme assist.html)"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          ".vibelearn/mockups/teach.html"
+        ],
+        "createdAt": "2026-11-22T08:57:52.817Z",
+        "reason": "Claude: marges réelles de VS Code et de vscode/extension.js, comme assist.html"
+      },
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          ".vibelearn/mockups/teach.html"
+        ],
+        "createdAt": "2026-11-22T08:58:15.524Z",
+        "reason": "Claude: maquette qui reprend les tailles réelles du panneau (vscode/extension.js : h2 à 1.15em)"
+      }
+    ]
+  }
+}

@@ -1,0 +1,30 @@
+[package]
+name = "vibelearn"
+version = "0.1.0"
+edition = "2024"
+description = "Learn by coding in your own project: an AI tutor that guides you and reviews your code in VS Code, and never writes your task for you."
+repository = "https://github.com/FunkyFight/vibelearn"
+
+[dependencies]
+anyhow = "1.0.104"
+chrono = { version = "0.4.45", features = ["serde"] }
+clap = { version = "4.6.8", features = ["derive"] }
+dirs = "7.0.0"
+eframe = { version = "0.37.0", default-features = false, features = ["wgpu", "default_fonts", "system_fonts", "wayland", "x11"], optional = true }
+egui = { version = "0.37.0", optional = true }
+egui_commonmark = { version = "0.26.0", optional = true }
+globset = "0.4"
+ignore = "0.4.34"
+notify = "8.2.2"
+regex = "1"
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+rpassword = "7"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+similar = "3.2.1"
+sys-locale = "0.3.2"
+tokio = { version = "1.54.1", features = ["rt-multi-thread", "macros", "process", "io-util", "sync", "time", "signal"] }
+
+[features]
+# Fenêtre graphique (egui/wgpu) à la place du mode fichiers : `cargo install --path . --features window`, puis `vibelearn --window …`.
+window = ["dep:eframe", "dep:egui", "dep:egui_commonmark"]

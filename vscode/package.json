@@ -1,0 +1,29 @@
+{
+  "name": "vibelearn",
+  "displayName": "vibelearn",
+  "description": "%vibelearn.description%",
+  "publisher": "vibelearn",
+  "version": "__VERSION__",
+  "license": "UNLICENSED",
+  "engines": { "vscode": "^1.75.0" },
+  "categories": ["Education"],
+  "main": "./extension.js",
+  "activationEvents": ["onStartupFinished"],
+  "capabilities": {
+    "untrustedWorkspaces": { "supported": true },
+    "virtualWorkspaces": false
+  },
+  "contributes": {
+    "commands": [
+      { "command": "vibelearn.show", "title": "%vibelearn.show%" },
+      { "command": "vibelearn.ask", "title": "%vibelearn.ask%" },
+      { "command": "vibelearn.hint", "title": "%vibelearn.hint%" },
+      { "command": "vibelearn.check", "title": "%vibelearn.check%" }
+    ],
+    "menus": {
+      "editor/context": [
+        { "command": "vibelearn.ask", "group": "navigation@99", "when": "vibelearn.active" }
+      ]
+    }
+  }
+}

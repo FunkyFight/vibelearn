@@ -1,0 +1,7 @@
+{
+  "vibelearn.description": "The vibelearn panel next to your code, and its markers in the editor.",
+  "vibelearn.show": "vibelearn: Open the panel",
+  "vibelearn.ask": "vibelearn: Ask about this line",
+  "vibelearn.hint": "vibelearn: Give me a hint",
+  "vibelearn.check": "vibelearn: Check my code"
+}
