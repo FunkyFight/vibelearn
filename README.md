@@ -441,8 +441,18 @@ vibelearn assist --mock
 **Publishing a release.**
 
 1. Raise `version` in [Cargo.toml](Cargo.toml).
-2. Build: `cargo build --release`.
-3. Create a GitHub release tagged `v<version>` and attach the raw executable, not an archive.
+2. Run [build.cmd](build.cmd). It builds the Windows executable, cross-compiles the Linux one with [cargo-zigbuild](https://github.com/rust-cross/cargo-zigbuild), and puts both in `dist\` under the names below.
+3. Create a GitHub release tagged `v<version>` and attach the files of `dist\` as they are, not in an archive.
+
+`build.cmd` needs cargo-zigbuild and zig, once:
+
+```powershell
+cargo install cargo-zigbuild
+```
+
+```powershell
+winget install zig.zig
+```
 
 The updater picks the asset from its name:
 
