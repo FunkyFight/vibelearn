@@ -292,6 +292,10 @@ fn strings() -> Value {
         "write_here": tr("écris ici", "write here"),
         "on_code": tr("Sur ton code", "On your code"),
         "talk": tr("Discussion", "Conversation"),
+        "float_title": tr("Sauvegarde", "Last save"),
+        "float_empty": tr("Rien à signaler pour l'instant.", "Nothing to point out for now."),
+        "float_detail": tr("Détail", "Detail"),
+        "float_reading": tr("Lecture de ta sauvegarde…", "Reading your save…"),
         "older_one": tr("question précédente", "earlier question"),
         "older": tr("questions précédentes", "earlier questions"),
         "more_actions": tr("Plus d'actions", "More actions"),
@@ -475,6 +479,8 @@ struct Front {
     error_reported: bool,
     last_flash: Option<String>,
     printed: usize,
+    /// La fenêtre flottante des remarques, si elle a pu s'ouvrir.
+    float: Option<crate::float::Float>,
 }
 
 impl Front {
@@ -529,6 +535,7 @@ impl Front {
             last_state: String::new(),
             version: 0,
             reveal: None,
+            float: None,
             notes_revealed: false,
             opened_demo: app.session.demo.as_ref().map(|d| d.title.clone()),
             install_done,
@@ -592,6 +599,18 @@ impl Front {
             match serde_json::from_str::<Incoming>(&text) {
                 Ok(message) => self.on_incoming(app, message),
                 Err(e) => eprintln!("  vibelearn : {} ({e})", tr("message illisible de VS Code", "unreadable message from VS Code")),
+            }
+        }
+    }
+
+    /// Les clics dans la fenêtre flottante.
+    fn read_float(&mut self, app: &mut App) {
+        let actions = self.float.as_ref().map(|f| f.actions()).unwrap_or_default();
+        for action in actions {
+            match action {
+                crate::float::Action::Goto { file, line } => self.reveal_at(file, line),
+                crate::float::Action::Teach(id) => self.on_remark(app, id, true),
+                crate::float::Action::Forget(id) => app.forget_remark(id),
             }
         }
     }
@@ -782,6 +801,13 @@ impl Front {
         let entries = &app.session.transcript;
         let start = app.turn_start.min(entries.len());
         let from_learner = start > 0 && matches!(entries[start - 1], Entry::User(_));
+        // Le tour répond à une sauvegarde (ou à « Vérifier ») : son texte est
+        // la phrase d'analyse, montrée dans la fenêtre flottante.
+        let from_save = entries[..start]
+            .iter()
+            .rev()
+            .find(|e| matches!(e, Entry::User(_) | Entry::Changes(_)))
+            .is_some_and(|e| matches!(e, Entry::Changes(_)));
         let text = entries[start..]
             .iter()
             .filter_map(|e| match e {
@@ -816,7 +842,14 @@ impl Front {
         let answered = from_learner
             && self.focus.is_some_and(|id| app.threads.post(Path::new(""), &Place::Thread(id), Kind::Question, None, None, &text).is_ok());
         if !answered && (from_learner || monitor || !app.threads.spoke()) {
-            app.threads.note(&text);
+            // En surveillance, tout ce que vibelearn dit sans qu'on lui ait rien
+            // demandé (lecture du projet au départ, retour d'une sauvegarde) est
+            // une analyse : elle va dans la fenêtre flottante.
+            if !from_learner && (from_save || monitor) {
+                app.threads.review(&text);
+            } else {
+                app.threads.note(&text);
+            }
         }
     }
 
@@ -824,6 +857,7 @@ impl Front {
         // Les corrections du mode assistance passent par l'éditeur quand il affiche la session.
         app.ui_live = self.acked;
         self.read_inbox(app);
+        self.read_float(app);
         self.read_code_questions(app);
 
         let busy = matches!(app.phase, Phase::Busy | Phase::Checking | Phase::Starting);
@@ -1003,6 +1037,8 @@ impl Front {
             .collect();
         let notes: Vec<Value> =
             threads.of_kind(Kind::Note).map(|t| json!({ "id": t.id, "text": t.vibelearn_notes().join("\n\n") })).collect();
+        // La phrase d'analyse de la dernière sauvegarde, pour la fenêtre flottante.
+        let review = threads.of_kind(Kind::Review).last().map(|t| json!({ "id": t.id, "text": t.vibelearn_notes().join("\n\n") }));
         // Mode assistance : les corrections à appliquer (pending) et celles à montrer (applied).
         let edits: Vec<Value> = app
             .assist_edits
@@ -1040,6 +1076,7 @@ impl Front {
             "next_steps": if ended { Vec::new() } else { next_steps },
             "pseudo": if ended { Vec::new() } else { pseudo },
             "notes": if ended { Vec::new() } else { notes },
+            "review": if ended { Value::Null } else { review.unwrap_or(Value::Null) },
             "edits": if ended { Vec::new() } else { edits },
             "celebrate": app.celebrate.as_ref().map(|c| json!({ "title": c.title, "summary": c.summary, "seq": c.seq })),
             "prompt": if ended { Value::Null } else { app.modal.as_ref().map(prompt_json).unwrap_or(Value::Null) },
@@ -1062,6 +1099,9 @@ impl Front {
             return;
         }
         self.last_state = text;
+        if let Some(float) = &self.float {
+            float.show(&state);
+        }
         self.version += 1;
         let mut state = state;
         state["version"] = json!(self.version);
@@ -1162,6 +1202,7 @@ pub async fn run(mut app: App, mut events: mpsc::UnboundedReceiver<AppEvent>, ed
         tr("Ctrl+C ici pour arrêter ; la session est sauvegardée.", "Ctrl+C here to stop; the session is saved."),
     );
     let mut front = Front::new(&mut app, editor);
+    front.float = crate::float::open(app.session.mode.watches_every_save());
 
     let mut ticker = tokio::time::interval(Duration::from_millis(100));
     let mut ended_since: Option<Instant> = None;

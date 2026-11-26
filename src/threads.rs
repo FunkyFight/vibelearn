@@ -36,6 +36,9 @@ pub enum Kind {
     Pseudo,
     /// Un message de vibelearn dans le panneau, sans ligne.
     Note,
+    /// Ce que vibelearn dit d'une sauvegarde, sans ligne : il va dans la
+    /// fenêtre flottante, avec les annotations, pas dans la discussion.
+    Review,
 }
 
 /// Tons d'une annotation, chacun avec son icône dans VS Code :
@@ -321,18 +324,29 @@ impl Threads {
     /// pour les effacer, seul le retour de la dernière sauvegarde reste).
     pub fn drop_older_notes(&mut self) {
         let turn = self.turn;
-        self.threads.retain(|t| !(t.kind == Kind::Note && t.turn < turn));
+        self.threads.retain(|t| !(matches!(t.kind, Kind::Note | Kind::Review) && t.turn < turn));
     }
 
     /// Un message de vibelearn dans le panneau, sans ligne.
     pub fn note(&mut self, body: &str) -> Posted {
+        self.message(Kind::Note, body)
+    }
+
+    /// Le retour de vibelearn sur la dernière sauvegarde (la phrase d'analyse).
+    /// Il remplace celui de la sauvegarde précédente.
+    pub fn review(&mut self, body: &str) -> Posted {
+        self.threads.retain(|t| t.kind != Kind::Review);
+        self.message(Kind::Review, body)
+    }
+
+    fn message(&mut self, kind: Kind, body: &str) -> Posted {
         self.spoke = true;
         self.push(Thread {
             id: 0,
             file: PathBuf::new(),
             line: 0,
             anchor: None,
-            kind: Kind::Note,
+            kind,
             tone: None,
             title: None,
             notes: vec![Note { author: Author::Vibelearn, body: body.trim().to_string() }],
@@ -579,6 +593,20 @@ mod tests {
         t.clear_step();
         assert!(t.all().is_empty());
         let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn the_review_of_a_save_replaces_the_previous_one_and_stays_out_of_the_conversation() {
+        let mut t = Threads::new(Path::new("."));
+        t.note("Une réponse");
+        t.review("Premier retour");
+        t.review("Second retour");
+        let reviews: Vec<_> = t.of_kind(Kind::Review).map(|r| r.vibelearn_notes()).collect();
+        assert_eq!(reviews, vec![vec!["Second retour"]]);
+        assert_eq!(t.of_kind(Kind::Note).count(), 1);
+        t.begin_turn();
+        t.drop_older_notes();
+        assert!(t.all().is_empty(), "le tour suivant efface le retour et les messages");
     }
 
     #[test]

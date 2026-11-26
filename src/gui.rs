@@ -198,7 +198,7 @@ impl eframe::App for Gui {
         self.help(&ctx);
     }
 
-    fn on_exit(&mut self) {
+    fn on_exit(&mut self, _gl: Option<&eframe::glow::Context>) {
         let had_engine = self.app.shutdown();
         if had_engine {
             // Laisse au moteur le temps de fermer la conversation proprement.

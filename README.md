@@ -179,7 +179,7 @@ It has three fixed areas.
 
 **In the middle, what you read.** Only this area scrolls.
 
-- "On your code": the edits made by vibelearn, each with "Undo", then its remarks sorted by severity.
+- "On your code": the edits made by vibelearn, each with "Undo".
 - "Conversation": your questions and its answers. The latest one is shown in full, the earlier ones are folded.
 - In a lesson: the title of the step, "Good to know", then "Your turn" with the success criteria and a "Where to write?" link.
 - When vibelearn asks you something (a choice, a free answer, a list of notions, an approval before writing a file or running a command), it comes before everything else.
@@ -187,6 +187,16 @@ It has three fixed areas.
 **At the bottom, the field.** Enter sends, Shift+Enter starts a new line, and the field grows with your text. Your question is about the line under your cursor in the editor, shown under the field. In a lesson, the helpers sit just above: "Hint", "I'm stuck", "Explain differently", "Go deeper".
 
 A single word in the field is the same as the matching button: `hint`, `check`, `stuck`, `explain`, `deeper`, `recap`, `skip`, `finish`, `plan`, `notes`, `help`, `quit`. `/run <command>` runs a command in your project and shows its output to vibelearn.
+
+### The floating window
+
+The remarks on your last save, sorted by severity, and the analysis vibelearn writes when it starts and after each save, are not in the conversation: they sit in a small window of their own, opened by vibelearn itself. It has no title bar and stays on top of every other window, so you can put it anywhere, outside VS Code too.
+
+- Drag it by its top strip. Resize it from its bottom right corner. Its place and size are kept in `~/.vibelearn/float.json`.
+- The arrow on the right of the strip, or a double click on the strip, folds it down to the strip alone (the number of remarks stays visible) and unfolds it.
+- A click on a remark goes to its line. "Detail" unfolds the explanation; "Teach me" and "Forget it" show on hover.
+
+In assist and monitor mode it opens with the session; in a learning session, at the first remark. `VIBELEARN_NO_FLOAT=1` turns it off.
 
 ### In the editor
 
@@ -340,6 +350,7 @@ For you, in `~/.vibelearn/` (or the folder given by `VIBELEARN_HOME`):
 | `config.json` | your settings |
 | `login.json` | the chosen connection: provider, URL, key, model |
 | `update.json` | the last release installed by the updater |
+| `float.json` | where the floating window sits and its size |
 
 In each project, in `.vibelearn/`:
 
@@ -361,6 +372,7 @@ This folder ignores itself in git (it contains a `.gitignore` with `*`). vibelea
 | `VIBELEARN_HOME` | Replaces `~/.vibelearn`. |
 | `VIBELEARN_CLAUDE` | Path of the `claude` binary (same as `--claude-bin`). |
 | `VIBELEARN_EDITOR` | Editor command (same as `--editor`). |
+| `VIBELEARN_NO_FLOAT` | Set to anything: the floating window of remarks does not open. |
 | `VIBELEARN_API_KEY` | API key read by `vibelearn login`, instead of typing it. |
 | `ANTHROPIC_API_KEY` | Used only with `--use-api-key`. Otherwise it is removed from the environment of the `claude` binary, so that the subscription is used. |
 
@@ -415,6 +427,7 @@ vibelearn (terminal)                          extension (VS Code)
 | [src/login.rs](src/login.rs), [src/config.rs](src/config.rs), [src/paths.rs](src/paths.rs) | connection, settings, locations |
 | [src/i18n.rs](src/i18n.rs) | interface language (French, English) |
 | [src/vscode.rs](src/vscode.rs) | the `code` command, building and installing the `.vsix` package |
+| [src/float.rs](src/float.rs) | the floating window of remarks (egui), on its own thread |
 | [src/gui.rs](src/gui.rs) | optional window (egui), only built with `--features window` |
 | [vscode/extension.js](vscode/extension.js) | the VS Code extension: panel, decorations, hovers, status bar |
 

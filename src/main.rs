@@ -11,6 +11,7 @@ mod app;
 mod assist;
 mod claude;
 mod config;
+mod float;
 mod front;
 #[cfg(feature = "window")]
 mod gui;

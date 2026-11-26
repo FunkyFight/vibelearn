@@ -738,10 +738,8 @@ class Session {
         this.undoEdit(m.id).catch((e) => log(`annulation : ${e}`));
         break;
       case 'teach':
-        this.send({ type: 'teach', id: m.id });
-        break;
       case 'forget':
-        this.send({ type: 'forget', id: m.id });
+        this.send({ type: m.type, id: m.id });
         break;
       case 'where':
         if (this.state.step && this.state.step.file) this.goto(this.state.step.file, this.state.step.line, this.state.step.anchor);
@@ -928,17 +926,18 @@ function panelHtml() {
     </div>
   </form>
 </footer>
-<script nonce="${nonce}">(${panelMain.toString()})();</script>
+<script nonce="${nonce}">const KIT = (${webKit.toString()})();
+(${panelMain.toString()})();</script>
 </body>
 </html>`;
 }
 
-// Trois zones fixes : l'état en haut, ce qui se lit au milieu (seul à défiler), le champ en bas.
-const PANEL_CSS = `
+// Les couleurs et les éléments de base des pages web.
+const THEME_CSS = `
 :root { color-scheme: light dark; }
 * { box-sizing: border-box; }
 html, body { height: 100%; }
-body { margin: 0; padding: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; font-family: var(--vscode-font-family); font-size: var(--vscode-font-size); line-height: 1.5; color: var(--vscode-foreground);
+body { margin: 0; padding: 0; font-family: var(--vscode-font-family); font-size: var(--vscode-font-size); line-height: 1.5; color: var(--vscode-foreground);
   --hair: color-mix(in srgb, var(--vscode-foreground) 13%, transparent); --edge: color-mix(in srgb, var(--vscode-foreground) 24%, transparent); --fill: color-mix(in srgb, var(--vscode-foreground) 8%, transparent);
   --desc: var(--vscode-descriptionForeground); --link: var(--vscode-textLink-foreground);
   --ok: var(--vscode-testing-iconPassed, #3FA15B); --fix: var(--vscode-editorWarning-foreground, #E0A100); --info: var(--vscode-editorInfo-foreground, #7F77DD); --design: #E06C98; --assist: #3AB7C8; }
@@ -955,14 +954,29 @@ pre { margin: 0; padding: 8px 10px; border-radius: 6px; overflow-x: auto; backgr
 pre code { background: none; padding: 0; }
 .md > * + * { margin-top: 8px; }
 .i { flex: none; }
-
-.bar { position: relative; z-index: 1; display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 12px; border-bottom: 1px solid var(--hair); }
+.tone { display: flex; margin-top: 3px; }
+.tone.ok { color: var(--ok); } .tone.fix { color: var(--fix); } .tone.design { color: var(--design); } .tone.info { color: var(--info); } .tone.assist { color: var(--assist); }
 .state { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
 .state.wait { background: var(--link); }
 .state.off { background: var(--edge); }
 .state.busy, .spin { flex: none; width: 9px; height: 9px; border-radius: 50%; background: none; border: 1.5px solid var(--link); border-right-color: transparent; animation: spin .8s linear infinite; }
 .spin { display: inline-block; border-color: currentColor; border-right-color: transparent; }
 @keyframes spin { to { transform: rotate(360deg); } }
+.link { border: 0; padding: 0; background: none; cursor: pointer; color: var(--link); }
+.link:hover:enabled { text-decoration: underline; }
+.loc { border: 0; padding: 0; background: none; cursor: pointer; font-variant-numeric: tabular-nums; }
+.loc:hover { color: var(--vscode-foreground); text-decoration: underline; }
+.icon-btn { flex: none; display: grid; place-items: center; width: 26px; height: 26px; border: 0; border-radius: 4px; background: none; cursor: pointer; transition: background-color .15s; }
+.icon-btn:hover, .icon-btn[aria-expanded="true"] { background: var(--fill); }
+.icon-btn[aria-pressed="true"] { background: var(--fill); color: var(--link); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+`;
+
+// Trois zones fixes : l'état en haut, ce qui se lit au milieu (seul à défiler), le champ en bas.
+const PANEL_CSS = THEME_CSS + `
+body { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+
+.bar { position: relative; z-index: 1; display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 12px; border-bottom: 1px solid var(--hair); }
 .bar-text { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bar-text strong { font-weight: 600; }
 .bar-text span { color: var(--desc); margin-left: 8px; }
@@ -970,13 +984,6 @@ pre code { background: none; padding: 0; }
 .btn:hover:enabled { background: var(--vscode-button-secondaryHoverBackground); }
 .btn.primary { background: var(--vscode-button-background); color: var(--vscode-button-foreground); }
 .btn.primary:hover:enabled { background: var(--vscode-button-hoverBackground); }
-.icon-btn { flex: none; display: grid; place-items: center; width: 26px; height: 26px; border: 0; border-radius: 4px; background: none; cursor: pointer; transition: background-color .15s; }
-.icon-btn:hover, .icon-btn[aria-expanded="true"] { background: var(--fill); }
-.icon-btn[aria-pressed="true"] { background: var(--fill); color: var(--link); }
-.link { border: 0; padding: 0; background: none; cursor: pointer; color: var(--link); }
-.link:hover:enabled { text-decoration: underline; }
-.loc { border: 0; padding: 0; background: none; cursor: pointer; font-variant-numeric: tabular-nums; }
-.loc:hover { color: var(--vscode-foreground); text-decoration: underline; }
 .menu { position: absolute; top: calc(100% - 2px); right: 8px; min-width: 220px; padding: 4px; border: 1px solid var(--vscode-menu-border, var(--edge)); border-radius: 6px; background: var(--vscode-menu-background, var(--vscode-editor-background)); box-shadow: 0 2px 8px rgba(0, 0, 0, .36); }
 .menu-item { display: block; width: 100%; text-align: left; border: 0; border-radius: 4px; padding: 4px 10px; background: none; cursor: pointer; }
 .menu-item:hover:enabled, .menu-item:focus-visible { background: var(--vscode-list-hoverBackground); }
@@ -994,8 +1001,6 @@ pre code { background: none; padding: 0; }
 .rows { list-style: none; padding: 0; }
 .row { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 0 8px; margin: 0; padding: 6px 12px; transition: background-color .15s; }
 .row:hover, .row:focus-within { background: var(--vscode-list-hoverBackground); }
-.tone { display: flex; margin-top: 3px; }
-.tone.ok { color: var(--ok); } .tone.fix { color: var(--fix); } .tone.design { color: var(--design); } .tone.info { color: var(--info); } .tone.assist { color: var(--assist); }
 .row-title { display: block; width: 100%; border: 0; padding: 0; background: none; text-align: left; cursor: pointer; }
 .row-detail { color: var(--desc); max-width: 68ch; }
 .row-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; margin-top: 2px; font-size: .92em; color: var(--desc); }
@@ -1091,36 +1096,10 @@ textarea:focus { outline: 1px solid var(--vscode-focusBorder); outline-offset: -
 .ctx { flex: none; padding: 0 6px; border-radius: 3px; background: var(--fill); font-size: .92em; color: var(--desc); font-variant-numeric: tabular-nums; }
 .send { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border: 0; border-radius: 4px; cursor: pointer; background: var(--vscode-button-background); color: var(--vscode-button-foreground); }
 .send:hover:enabled { background: var(--vscode-button-hoverBackground); }
-@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 `;
 
-/** Le script du panneau. Il tourne dans la page web : il ne voit rien d'autre de ce fichier. */
-function panelMain() {
-  const vscode = acquireVsCodeApi();
-  let S = null;
-  let CTX = null;
-  let menu = false;
-  // L'aide-mémoire des commentaires, à la place de la discussion.
-  let sheet = false;
-  let sheetScroll = 0;
-  let askedId = null;
-  let olderOpen = false;
-  const openOld = new Set();
-  let choices = {};
-  let multi = {};
-  let promptId = null;
-  let answersSeen = null;
-  let pop = { seq: null, at: 0 };
-  const shown = {};
-  const $ = (id) => document.getElementById(id);
-  /** Ne réécrit une zone que si son contenu change : le survol, le focus et ce qui est déplié tiennent. */
-  const put = (id, html) => {
-    if (shown[id] === html) return false;
-    shown[id] = html;
-    $(id).innerHTML = html;
-    return true;
-  };
-
+/** Les outils communs des pages web. Tourne dans la page web. */
+function webKit() {
   const ICONS = {
     check: '<path d="M3 8.5l3 3 7-7"/>',
     alert: '<path d="M8 2l6.5 11.5h-13z"/><path d="M8 6.5v3"/><path d="M8 11.8v.2"/>',
@@ -1136,8 +1115,6 @@ function panelMain() {
   const TONE_ICONS = { ok: 'check', fix: 'alert', design: 'blocks', info: 'bulb', assist: 'pencil' };
   /** Ce qui casse d'abord, les compliments en dernier. */
   const TONE_RANK = { fix: 0, design: 1, info: 2, ok: 3 };
-  /** Les modes sans étape, où vibelearn regarde chaque sauvegarde. */
-  const watchMode = () => S.mode === 'monitor' || S.mode === 'assist';
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   const icon = (name, label) =>
     `<svg class="i" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" ${label ? `role="img" aria-label="${esc(label)}"` : 'aria-hidden="true"'}>${ICONS[name] || ''}</svg>`;
@@ -1207,6 +1184,40 @@ function panelMain() {
     return flat.length > 70 ? flat.slice(0, 69) + '…' : flat;
   };
 
+  return { ICONS, DOTS, TONE_ICONS, TONE_RANK, esc, icon, tone, spinner, inline, md, base, at, short };
+}
+
+/** Le script du panneau. Il tourne dans la page web : il ne voit rien d'autre de ce fichier. */
+function panelMain() {
+  const vscode = acquireVsCodeApi();
+  let S = null;
+  let CTX = null;
+  let menu = false;
+  // L'aide-mémoire des commentaires, à la place de la discussion.
+  let sheet = false;
+  let sheetScroll = 0;
+  let askedId = null;
+  let olderOpen = false;
+  const openOld = new Set();
+  let choices = {};
+  let multi = {};
+  let promptId = null;
+  let answersSeen = null;
+  let pop = { seq: null, at: 0 };
+  const shown = {};
+  const $ = (id) => document.getElementById(id);
+  /** Ne réécrit une zone que si son contenu change : le survol, le focus et ce qui est déplié tiennent. */
+  const put = (id, html) => {
+    if (shown[id] === html) return false;
+    shown[id] = html;
+    $(id).innerHTML = html;
+    return true;
+  };
+
+  /** Les modes sans étape, où vibelearn regarde chaque sauvegarde. */
+  const watchMode = () => S.mode === 'monitor' || S.mode === 'assist';
+  const { DOTS, esc, icon, tone, spinner, inline, md, base, at, short } = KIT;
+
   function confetti() {
     const colors = ['#378ADD', '#1D9E75', '#EF9F27', '#D4537E', '#7F77DD'];
     let s = '<div class="confetti" aria-hidden="true">';
@@ -1266,28 +1277,15 @@ function panelMain() {
     return h + '</div>';
   }
 
-  /** Ce que vibelearn a corrigé, puis ce qu'il a remarqué : une liste, la ligne au clic. */
+  /** Ce que vibelearn a corrigé : une liste, la ligne au clic. Ses remarques sont dans la fenêtre flottante de vibelearn. */
   function rowsHtml(t, ended) {
     const edits = ended ? [] : S.edits || [];
-    const remarks = (S.annotations || []).slice().sort((a, b) => (TONE_RANK[a.tone] ?? 2) - (TONE_RANK[b.tone] ?? 2));
-    if (!edits.length && !remarks.length) return '';
+    if (!edits.length) return '';
     let h = '<ul class="rows">';
     for (const e of edits) {
       const act = e.status === 'applied' ? `<button class="link" type="button" data-undo="${e.id}">${esc(t.undo)}</button>` : `<span class="doing">${spinner()}${esc(t.applying)}</span>`;
       h += `<li class="row">${tone('assist', t)}<div><button class="row-title" type="button" data-gotoe="${e.id}"><span class="swap"><code>${esc(short(e.old))}</code>${icon('arrow', t.becomes)}<code>${esc(short(e.new))}</code></span></button>`;
       h += `<div class="row-detail">${inline(e.reason)}</div><p class="row-meta"><button class="loc" type="button" data-gotoe="${e.id}">${at(e.file, e.line)}</button><span class="row-actions always">${act}</span></p></div></li>`;
-    }
-    for (const a of remarks) {
-      const name = a.tone in TONE_ICONS ? a.tone : 'info';
-      // Le titre, puis l'explication en plus discret.
-      const [head, ...rest] = String(a.text || '').split(/\n\s*\n/);
-      // En surveillance : une leçon courte sur la remarque (hors leçon), ou l'oublier.
-      const acts = watchMode()
-        ? (S.step ? '' : `<button class="link" type="button" data-teach="${a.id}">${esc(t.teach)}</button>`) + `<button class="link" type="button" data-forget="${a.id}">${esc(t.forget)}</button>`
-        : '';
-      h += `<li class="row">${tone(name, t)}<div><button class="row-title" type="button" data-goto="${a.id}">${inline(head)}</button>`;
-      h += rest.length ? `<div class="row-detail md">${md(rest.join('\n\n'))}</div>` : '';
-      h += `<p class="row-meta"><button class="loc" type="button" data-goto="${a.id}">${at(a.file, a.line)}</button>${acts ? `<span class="row-actions">${acts}</span>` : ''}</p></div></li>`;
     }
     return h + '</ul>';
   }
@@ -1479,16 +1477,11 @@ function panelMain() {
       vscode.postMessage({ type: 'command', name: d.cmd });
     } else if (d.sheet) toggleSheet();
     else if (d.undo) vscode.postMessage({ type: 'undo', id: Number(d.undo) });
-    else if (d.teach) vscode.postMessage({ type: 'teach', id: Number(d.teach) });
-    else if (d.forget) vscode.postMessage({ type: 'forget', id: Number(d.forget) });
     else if (d.gotoe) {
       const x = (S.edits || []).find((y) => String(y.id) === d.gotoe);
       if (x) vscode.postMessage({ type: 'goto', file: x.file, line: x.line, anchor: x.new });
     } else if (d.where) vscode.postMessage({ type: 'where' });
-    else if (d.goto) {
-      const a = (S.annotations || []).find((x) => String(x.id) === d.goto);
-      if (a) vscode.postMessage({ type: 'goto', file: a.file, line: a.line, anchor: a.anchor });
-    } else if (d.gotoq) {
+    else if (d.gotoq) {
       const q = (S.talk || []).find((x) => String(x.id) === d.gotoq);
       if (q && q.file) vscode.postMessage({ type: 'goto', file: q.file, line: q.line });
     } else if (d.seg) {
